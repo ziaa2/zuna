@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ZUNA - Alat Bantu Harian</title>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @keyframes reveal {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-reveal { animation: reveal 0.5s ease-out forwards; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ZUNA</div>
+        <div class= >Alat Bantu Harian</div>
+        <div class="h-right">
+            <!-- Tombol Donasi Aktif -->
+            <button onclick="Zuna.open('v-donasi')" class="btn-top" style="border:none; cursor:pointer; outline:none;">Donasi</button>
+        </div>
+    </header>
+
+    <div id="main-dashboard" class="grid"></div>
+
+    <div id="tool-container">
+        <!-- Halaman Donasi -->
+        <div id="v-donasi" class="view">
+            <span class="back-btn" onclick="history.back()">✕ KEMBALI</span>
+            
+            <div class="tool-ui" style="text-align: center; animation: reveal 0.5s ease-out;">
+                <i class="ph ph-heart" style="font-size: 50px; color: #faae2b; margin-bottom: 20px; display: block;"></i>
+                <h2 style="margin-bottom: 15px; font-weight: 800; color: #fff;">Dukung ZUNA</h2>
+                
+                <p style="color: var(--sub); line-height: 1.6; margin-bottom: 30px; font-size: 13px; text-align: left;">
+                    Halo! Terima kasih sudah menggunakan aplikasi Zuna. <br><br>
+                    Project ini dikembangkan untuk membantu mempermudah urusan harianmu secara gratis dan tanpa iklan. <br><br>
+                    Jika kamu merasa terbantu, dukungan darimu sangat berarti untuk menjaga aplikasi ini tetap hidup dan terus update fitur baru.
+                </p>
+
+                <!-- Tombol Saweria -->
+                <button class="btn-calc" onclick="window.open('https://saweria.co/maszaxx', '_blank')" style="background: #faae2b; color: #000; font-weight:800;">
+                    LANJUT KE SAWERIA
+                </button>
+                
+                <p style="font-size: 9px; color: #333; margin-top: 20px; letter-spacing: 1px;">SUPPORT VIA QRIS, DANA, OVO, GOPAY, DLL</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>VERSI 2026.08 • PRIVASI TERJAMIN • BY ZUNA</p>
+    </footer>
+
+    <script src="core.js"></script>
+    <script src="modules/tabungan.js"></script>
+    <script src="modules/tagihan.js"></script>
+    <script src="modules/banding.js"></script>
+    <script src="modules/kredit.js"></script>     
+    <script src="modules/bisnis.js"></script>
+    <script src="modules/qr-gen.js"></script>
+    <script src="modules/belanja.js"></script>
+    <script src="modules/budget.js"></script>
+    <script src="modules/target-save.js"></script>
+    <script src="modules/speed-read.js"></script>
+    <script src="modules/receh.js"></script>
+    <script src="modules/transfer-pro.js"></script>
+</body>
+</html>
