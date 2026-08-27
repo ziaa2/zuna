@@ -143,25 +143,29 @@ Zuna.register({
                     } 
                     
                     if (payload.type === 'done') {
-                        document.getElementById('tr-rec-info').innerText = "MENYIMPAN FILE...";
+                        // GANTI LOGIKA DISINI: Munculkan tombol manual agar tidak diblokir browser
+                        document.getElementById('tr-rec-info').innerText = "DATA DITERIMA!";
+                        document.getElementById('tr-rec-msg').innerText = "Klik tombol di bawah untuk menyimpan ke HP";
+                        
                         const blob = new Blob(chunks);
                         const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = payload.name;
-                        a.click();
                         
-                        setTimeout(() => {
-                            URL.revokeObjectURL(url);
-                            chunks = [];
-                            alert("BERHASIL! Cek folder download HP kamu.");
-                            location.reload(); 
-                        }, 2000);
+                        const finalBtn = document.getElementById('tr-final-dl');
+                        finalBtn.style.display = "block"; // Pastikan tombol muncul
+                        finalBtn.innerText = "SIMPAN FILM KE HP";
+                        
+                        finalBtn.onclick = () => {
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = payload.name;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            
+                            setTimeout(() => {
+                                alert("File sedang disimpan ke folder Download.");
+                                location.reload();
+                            }, 1000);
+                        };
                     }
                 });
-            });
-
-            peer.on('error', () => alert("Gagal hubung. PIN salah atau pengirim offline."));
-        };
-    }
-});
