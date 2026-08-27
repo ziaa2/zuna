@@ -1,7 +1,7 @@
 Zuna.register({
     id: 'f-transfer',
     title: 'Zuna Transfer',
-    desc: 'Transfer Film High-Speed (V10 Pro)',
+    desc: 'Transfer Film High-Speed (V11 Ultimate)',
     icon: 'ph ph-share-network',
     html: `
         <div class="tool-ui">
@@ -14,28 +14,28 @@ Zuna.register({
             <!-- Panel Kirim -->
             <div id="panel-send">
                 <div class="tool-ui" style="border:2px dashed #333; text-align:center; padding:30px 10px; background:rgba(255,255,255,0.01)">
-                    <span class="label">PILIH VIDEO / FILM (MAKS 5GB)</span>
+                    <span class="label">PILIH VIDEO / FILM (MAKS 2GB)</span>
                     <input type="file" id="tr-file" style="font-size:12px; margin-top:10px; width:100%">
                 </div>
                 
                 <div id="tr-prog-cont" style="display:none; margin:25px 0">
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-                        <span class="label" id="tr-status" style="color:var(--green)">MENGIRIM KE CLOUD...</span>
+                        <span class="label" id="tr-status" style="color:var(--green)">MENGHUBUNGKAN...</span>
                         <span class="label" id="tr-percent">0%</span>
                     </div>
                     <div style="width:100%; height:12px; background:#000; border-radius:20px; overflow:hidden; border:1px solid #222">
                         <div id="tr-bar" style="width:0%; height:100%; background:var(--green); transition:0.3s; box-shadow:0 0 15px var(--green)"></div>
                     </div>
-                    <p style="font-size:9px; color:var(--sub); margin-top:10px; text-align:center">JANGAN PINDAH TAB ATAU LAYAR MATI</p>
+                    <p style="font-size:9px; color:var(--sub); margin-top:10px; text-align:center">JANGAN TUTUP HALAMAN INI</p>
                 </div>
 
-                <button id="tr-btn-up" class="btn-calc" style="background:var(--green); color:#000; margin-top:15px">START UPLOAD</button>
+                <button id="tr-btn-up" class="btn-calc" style="background:var(--green); color:#000; margin-top:15px">MULAI TRANSFER</button>
                 
                 <div id="tr-res-send" style="display:none; margin-top:30px; text-align:center; animation:reveal 0.5s ease;">
                     <div style="background:#fff; color:#000; padding:25px; border-radius:30px;">
                         <span style="font-size:10px; font-weight:800; color:#888; letter-spacing:2px">PIN TRANSFER ANDA</span>
                         <h1 id="tr-display-pin" style="font-size:60px; letter-spacing:10px; margin:10px 0; font-family:'JetBrains Mono'; font-weight:800">----</h1>
-                        <p id="tr-link-backup" style="font-size:8px; color:#aaa; word-break:break-all; margin-top:10px"></p>
+                        <p style="font-size:9px; color:#999">Masukkan PIN ini di HP Penerima</p>
                     </div>
                 </div>
             </div>
@@ -57,9 +57,8 @@ Zuna.register({
         </div>
     `,
     logic: () => {
-        // TOKEN DATABASE KHUSUS ZUNA (KeyValue)
-        const DB_TOKEN = "zuna_pro_vault_2026"; 
-        const DB_URL = `https://api.keyvalue.xyz/${DB_TOKEN}/`;
+        // Database PIN menggunakan KeyValue API (Gunakan Token Unik)
+        const DB_URL = `https://api.keyvalue.xyz/zuna_ultimate_transfer_v11/`;
 
         window.app_tr_switch = (mode) => {
             const isSend = mode === 'send';
@@ -72,100 +71,103 @@ Zuna.register({
         };
 
         // --- FUNGSI KIRIM ---
-        document.getElementById('tr-btn-up').onclick = function() {
+        document.getElementById('tr-btn-up').onclick = async function() {
             const file = document.getElementById('tr-file').files[0];
-            if (!file) return alert("Pilih file dulu!");
+            if (!file) return alert("Pilih filenya dulu bos!");
 
             const btn = this;
             const progCont = document.getElementById('tr-prog-cont');
+            const bar = document.getElementById('tr-bar');
+            const percentTxt = document.getElementById('tr-percent');
             
             btn.disabled = true;
             progCont.style.display = 'block';
             document.getElementById('tr-res-send').style.display = 'none';
 
-            // 1. UPLOAD KE PIXELDRAIN (Paling Cepat & Stabil)
-            const fd = new FormData();
-            fd.append('file', file);
+            try {
+                // 1. Dapatkan Server Terbaik dari Gofile
+                document.getElementById('tr-status').innerText = "MENCARI SERVER...";
+                const serverRes = await fetch('https://api.gofile.io/getServer');
+                const serverData = await serverRes.json();
+                
+                if (serverData.status !== 'ok') throw new Error("Server Gofile Sibuk");
+                const uploadUrl = `https://${serverData.data.server}.gofile.io/uploadFile`;
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'https://pixeldrain.com/api/file');
+                // 2. Mulai Upload menggunakan XMLHttpRequest agar ada Progress
+                const fd = new FormData();
+                fd.append('file', file);
 
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable) {
-                    const p = Math.round((e.loaded / e.total) * 100);
-                    document.getElementById('tr-bar').style.width = p + '%';
-                    document.getElementById('tr-percent').innerText = p + '%';
-                    btn.innerText = "UPLOADING " + p + "%";
-                }
-            };
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', uploadUrl);
 
-            xhr.onload = async function() {
-                if (xhr.status === 201 || xhr.status === 200) {
-                    const resp = JSON.parse(xhr.responseText);
-                    const dlUrl = `https://pixeldrain.com/api/file/${resp.id}`;
-                    const pin = Math.floor(1000 + Math.random() * 9999).toString();
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const p = Math.round((e.loaded / e.total) * 100);
+                        bar.style.width = p + '%';
+                        percentTxt.innerText = p + '%';
+                        document.getElementById('tr-status').innerText = p < 100 ? "MENGIRIM FILE..." : "MENGUNCI PIN...";
+                    }
+                };
 
-                    btn.innerText = "GENERATING PIN...";
+                xhr.onload = async function() {
+                    if (xhr.status === 200) {
+                        const resp = JSON.parse(xhr.responseText);
+                        const dlUrl = resp.data.downloadPage;
+                        const pin = Math.floor(1000 + Math.random() * 9000).toString();
 
-                    // 2. SIMPAN KE DATABASE PIN DENGAN RETRY
-                    try {
-                        const sync = await fetch(DB_URL + pin, {
-                            method: 'POST',
-                            body: dlUrl
-                        });
+                        // 3. Simpan PIN ke Database
+                        await fetch(DB_URL + pin, { method: 'POST', body: dlUrl });
 
-                        if (sync.ok) {
-                            document.getElementById('tr-res-send').style.display = 'block';
-                            document.getElementById('tr-display-pin').innerText = pin;
-                            document.getElementById('tr-link-backup').innerText = "Link: " + dlUrl;
-                            progCont.style.display = 'none';
-                            btn.innerText = "UPLOAD BERHASIL";
-                        } else throw new Error();
-                    } catch (e) {
-                        // BACKUP: Jika PIN gagal, tampilkan Link Langsung agar upload tidak sia-sia
-                        alert("PIN Database sibuk. Ini link download langsungnya: " + dlUrl);
                         document.getElementById('tr-res-send').style.display = 'block';
-                        document.getElementById('tr-display-pin').innerText = "ERROR";
-                        document.getElementById('tr-link-backup').innerText = dlUrl;
+                        document.getElementById('tr-display-pin').innerText = pin;
                         progCont.style.display = 'none';
+                        btn.innerText = "TRANSFER LAGI";
+                        btn.disabled = false;
+                    } else {
+                        alert("Gagal upload ke cloud. Coba lagi.");
                         btn.disabled = false;
                     }
-                } else {
-                    alert("Upload Gagal (Status: " + xhr.status + "). Coba lagi.");
-                    btn.disabled = false;
-                }
-            };
-            xhr.send(fd);
+                };
+
+                xhr.send(fd);
+
+            } catch (err) {
+                alert("Error: " + err.message);
+                btn.disabled = false;
+                progCont.style.display = 'none';
+            }
         };
 
         // --- FUNGSI TERIMA ---
         document.getElementById('tr-btn-down').onclick = async function() {
             const pin = document.getElementById('tr-input-pin').value;
-            if (pin.length < 4) return alert("Input PIN 4 Digit!");
+            if (pin.length < 4) return alert("Masukkan 4 digit PIN!");
 
             const btn = this;
-            btn.innerText = "SEARCHING...";
+            btn.innerText = "MENCARI...";
             btn.disabled = true;
 
             try {
-                // Tambahkan No-Cache agar data fresh
+                // Tambahkan nocache agar data fresh
                 const res = await fetch(DB_URL + pin + "?t=" + Date.now());
                 if (res.ok) {
                     const dlUrl = await res.text();
-                    if (dlUrl.includes('http')) {
+                    if (dlUrl.startsWith('http')) {
                         document.getElementById('tr-res-rec').style.display = 'block';
                         document.getElementById('tr-final-dl').onclick = () => {
                             window.open(dlUrl.trim(), '_blank');
                         };
-                        btn.innerText = "FILE FOUND!";
-                    } else throw new Error();
+                        btn.innerText = "DITEMUKAN!";
+                    } else {
+                        throw new Error();
+                    }
                 } else {
-                    alert("PIN tidak ditemukan atau kadaluarsa.");
+                    alert("PIN tidak ditemukan atau sudah hangus.");
                     btn.innerText = "AMBIL FILE";
                     btn.disabled = false;
                 }
             } catch (err) {
-                alert("Gangguan koneksi database.");
+                alert("Koneksi gagal. Coba lagi.");
                 btn.disabled = false;
                 btn.innerText = "AMBIL FILE";
             }
