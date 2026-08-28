@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-receh',
+    category: 'keuangan', 
     title: 'Pelacak Receh',
     desc: 'Catat pengeluaran kecil (24j)',
     icon: 'ph ph-coins',
