@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-thumb-tester',
+    category: 'kreatif', 
     title: 'Thumbnail Preview',
     desc: 'Cek Thumbnail di Berbagai Ukuran',
     icon: 'ph ph-projector-screen',
