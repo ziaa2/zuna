@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-bisnis',
+    category:'keuangan', 
     title: 'Bisnis Pro',
     desc: 'Modal & Balik Modal',
     icon: 'ph ph-briefcase',
