@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-targetsave',
+    category: 'keuangan', 
     title: 'Saving Planner',
     desc: 'Breakdown tabungan buat barang impian',
     icon: 'ph ph-target',
