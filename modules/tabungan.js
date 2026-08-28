@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-tabungan',
+    category: 'keuangan', 
     title: 'Wealth Pro',
     desc: 'Simulasi & Detail Bulanan',
     icon: 'ph ph-chart-line-up',
