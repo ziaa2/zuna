@@ -1,6 +1,7 @@
 Zuna.register({
     id: 'f-kredit',
     title: 'Kredit Pro',
+    category: 'keuangan', 
     desc: 'Cicilan KPR & Motor',
     icon: 'ph ph-hand-coins',
     html: `
