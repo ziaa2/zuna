@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-budget',
+    category:'keuangan', 
     title: 'Salary Splitter',
     desc: 'Atur gaji dengan rumus 50/30/20',
     icon: 'ph ph-wallet',
