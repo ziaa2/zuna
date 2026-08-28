@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-qrgen',
+    category: 'tools', 
     title: 'QR Generator',
     desc: 'Ubah teks & link jadi QR',
     icon: 'ph ph-qr-code',
