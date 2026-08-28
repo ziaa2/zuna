@@ -1,5 +1,6 @@
 Zuna.register({
     id: 'f-speedread',
+    category: 'tools', 
     title: 'Speed Reader 2X',
     desc: 'Baca 2 kata sekaligus biar lebih kilat',
     icon: 'ph ph-lightning',
