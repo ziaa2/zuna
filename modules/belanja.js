@@ -1,6 +1,6 @@
 Zuna.register({
     id: 'f-belanja',
-    category:'keuangan', 
+    category: 'keuangan', 
     title: 'List Belanja',
     desc: 'Hapus otomatis dlm 24 jam',
     icon: 'ph ph-shopping-cart',
