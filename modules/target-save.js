@@ -1,87 +1,165 @@
 Zuna.register({
     id: 'f-targetsave',
     category: 'keuangan', 
-    title: 'Saving Planner',
-    desc: 'Breakdown tabungan buat barang impian',
+    title: 'Saving Planner Pro+',
+    desc: 'Hitung target vs kemampuan harian',
     icon: 'ph ph-target',
     html: `
-        <div class="tool-ui">
-            <span class="label">Nama Barang</span>
-            <input type="text" id="target-name" placeholder="Misal: iPhone 16 Pro" style="font-size:16px; margin-bottom:15px">
-            
-            <span class="label">Harga Barang</span>
-            <input type="text" id="target-price" placeholder="Rp 0" style="color:var(--green); font-family:'JetBrains Mono'">
-            
-            <div id="target-res" style="display:none; margin-top:25px">
-                <div class="ideal-box">
-                    <span class="label" style="color:#000">REKOMENDASI NABUNG (IDEAL)</span>
-                    <h2 id="res-ideal" style="color:#000; font-size:28px">Rp 0</h2>
-                    <p id="res-note" style="color:rgba(0,0,0,0.5); font-size:10px; font-weight:700; margin-top:5px"></p>
+        <div class="tool-ui animate-in">
+            <!-- Header Deskripsi -->
+            <div style="background: rgba(99, 102, 241, 0.05); border-radius: 15px; padding: 15px; margin-bottom: 25px; border: 1px solid rgba(99, 102, 241, 0.1); display: flex; gap: 12px; align-items: center;">
+                <i class="ph ph-trend-up" style="font-size: 24px; color: var(--indigo)"></i>
+                <div style="font-size: 11px; color: var(--sub); line-height: 1.5">
+                    <b style="color:white; display:block; margin-bottom:2px">Ultimate Saving Engine</b>
+                    Rencanakan pembelian barang impian hingga 10 tahun ke depan. Gunakan fitur "Kemampuan Nabung" untuk tahu kapan targetmu tercapai.
+                </div>
+            </div>
+
+            <div style="margin-bottom:20px">
+                <span class="label">NAMA BARANG IMPIAN</span>
+                <input type="text" id="target-name" placeholder="Misal: Mobil, Rumah, iPhone..." style="font-size:16px; margin-bottom:15px; border-bottom: 2px solid #222">
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:15px">
+                    <div>
+                        <span class="label">HARGA BARANG</span>
+                        <input type="text" id="target-price" placeholder="Rp 0" style="color:var(--green); font-family:'JetBrains Mono'; font-weight:800">
+                    </div>
+                    <div>
+                        <span class="label">SALDO SAAT INI</span>
+                        <input type="text" id="target-current" placeholder="Rp 0" style="color:var(--indigo); font-family:'JetBrains Mono'; font-weight:800">
+                    </div>
                 </div>
 
-                <div class="grid-res" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px">
-                    <div class="mini-card">
-                        <span class="label">PER HARI</span>
-                        <span id="res-day" class="val-save">0</span>
-                        <span class="sub-label">Target 1 Bulan</span>
-                    </div>
-                    <div class="mini-card">
-                        <span class="label">PER BULAN</span>
-                        <span id="res-month" class="val-save">0</span>
-                        <span class="sub-label">Target 1 Tahun</span>
-                    </div>
-                    <div class="mini-card">
-                        <span class="label">PER TAHUN</span>
-                        <span id="res-year" class="val-save">0</span>
-                        <span class="sub-label">Target 5 Tahun</span>
-                    </div>
-                    <div class="mini-card" style="background:var(--indigo)">
-                        <span class="label" style="color:white">5 TAHUN</span>
-                        <span id="res-5year" class="val-save" style="color:white">0</span>
-                        <span class="sub-label" style="color:rgba(255,255,255,0.6)">Total Nabung</span>
-                    </div>
+                <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 15px; border: 1px solid #1a1a1a">
+                    <span class="label" style="color:var(--green)">KEMAMPUAN NABUNG / HARI (OPSIONAL)</span>
+                    <input type="text" id="target-daily-ability" placeholder="Berapa yang bisa kamu sisihkan per hari?" style="font-family:'JetBrains Mono'; font-size:14px; margin-top:5px">
+                    <p style="font-size:9px; color:var(--sub); margin-top:5px">Sistem akan menghitung berapa lama kamu harus menabung dengan angka ini.</p>
+                </div>
+            </div>
+            
+            <div id="target-res" style="display:none; margin-top:25px">
+                <!-- Sisa Kekurangan Dana -->
+                <div style="text-align:center; margin-bottom:25px; background:#111; padding:20px; border-radius:20px; border:1px solid #1a1a1a">
+                    <span class="label">SISA KEKURANGAN DANA</span>
+                    <h3 id="res-rem" style="font-size:28px; color:#fff; font-family:'JetBrains Mono'; margin:5px 0">Rp 0</h3>
+                </div>
+
+                <!-- HASIL KEMAMPUAN USER -->
+                <div id="user-plan-box" style="display:none; background:var(--green); color:#000; padding:20px; border-radius:20px; margin-bottom:30px; text-align:center; position:relative">
+                    <i class="ph ph-calendar-check" style="position:absolute; right:15px; top:15px; font-size:30px; opacity:0.2"></i>
+                    <span class="label" style="color:#000; opacity:0.7; font-weight:900">RENCANA SESUAI KEMAMPUANMU</span>
+                    <h2 id="user-plan-time" style="font-size:24px; font-weight:900; margin:5px 0">---</h2>
+                    <p id="user-plan-note" style="font-size:10px; font-weight:700; opacity:0.8"></p>
+                </div>
+
+                <!-- Opsi Proyeksi Waktu -->
+                <span class="label" style="display:block; text-align:center; margin-bottom:15px">PROYEKSI TARGET WAKTU</span>
+                
+                <div id="strategy-list" style="display:flex; flex-direction:column; gap:10px">
+                    <!-- List Strategi Generated by JS -->
                 </div>
             </div>
         </div>
 
         <style>
-            .ideal-box { background: var(--green); padding: 25px; border-radius: 25px; text-align: center; }
-            .mini-card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 15px; border-radius: 20px; }
-            .val-save { display: block; font-size: 16px; font-weight: 800; color: #fff; margin: 5px 0; font-family: 'JetBrains Mono'; }
-            .sub-label { font-size: 8px; font-weight: 800; color: var(--sub); letter-spacing: 1px; text-transform: uppercase; }
+            .strategy-card {
+                background: #111; border: 1px solid #1a1a1a; padding: 15px;
+                border-radius: 18px; display: flex; justify-content: space-between;
+                align-items: center; transition: 0.2s;
+            }
+            .strategy-info { display: flex; flex-direction: column; gap: 3px; }
+            .strategy-values { text-align: right; }
+            
+            .tag { font-size: 7px; font-weight: 900; padding: 2px 6px; border-radius: 4px; width: fit-content; margin-bottom: 4px; text-transform: uppercase; }
+            .dur-text { font-size: 12px; font-weight: 800; color: #fff; }
+            
+            .v-daily { display: block; font-size: 14px; font-weight: 800; color: var(--green); font-family: 'JetBrains Mono'; }
+            .v-monthly { display: block; font-size: 10px; color: var(--sub); font-family: 'JetBrains Mono'; margin-top: 2px; }
+            
+            @keyframes revealIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+            .animate-item { animation: revealIn 0.3s ease-out forwards; }
         </style>
     `,
     logic: () => {
         const calculate = () => {
             const price = Zuna.val('target-price');
+            const current = Zuna.val('target-current') || 0;
+            const ability = Zuna.val('target-daily-ability') || 0;
             const resDiv = document.getElementById('target-res');
+            const itemName = document.getElementById('target-name').value || "Barang";
             
-            if (price <= 0) {
+            const remainder = price - current;
+
+            if (price <= 0 || remainder <= 0) {
                 resDiv.style.display = 'none';
                 return;
             }
+            
             resDiv.style.display = 'block';
+            document.getElementById('res-rem').innerText = 'Rp ' + Zuna.fmt(remainder);
 
-            // 1. Kalkulasi Dasar
-            const perDay = Math.ceil(price / 30);      // Jika target 1 bulan
-            const perMonth = Math.ceil(price / 12);    // Jika target 1 tahun
-            const perYear = Math.ceil(price / 5);      // Jika target 5 tahun
-            const fiveYearTotal = price;               // Total yang harus dikumpul
+            // 1. Hitung Plan Berdasarkan Kemampuan User
+            const userPlanBox = document.getElementById('user-plan-box');
+            if (ability > 0) {
+                userPlanBox.style.display = 'block';
+                const totalDays = Math.ceil(remainder / ability);
+                const years = Math.floor(totalDays / 365);
+                const months = Math.floor((totalDays % 365) / 30);
+                const days = totalDays % 30;
 
-            // 2. Logika "Ideal" (Kita sarankan nabung harian dengan target 1 tahun biar gak berat)
-            const idealDaily = Math.ceil(price / 365);
-            
-            // 3. Update UI
-            document.getElementById('res-ideal').innerText = 'Rp ' + Zuna.fmt(idealDaily);
-            document.getElementById('res-note').innerText = `NABUNG HARIAN SELAMA 1 TAHUN UNTUK MENCAPAI RP ${Zuna.fmt(price)}`;
-            
-            document.getElementById('res-day').innerText = 'Rp ' + Zuna.fmt(perDay);
-            document.getElementById('res-month').innerText = 'Rp ' + Zuna.fmt(perMonth);
-            document.getElementById('res-year').innerText = 'Rp ' + Zuna.fmt(perYear);
-            document.getElementById('res-5year').innerText = 'Rp ' + Zuna.fmt(fiveYearTotal);
+                let timeStr = "";
+                if (years > 0) timeStr += `${years} Thn `;
+                if (months > 0) timeStr += `${months} Bln `;
+                if (days > 0 && years === 0) timeStr += `${days} Hari`;
+                
+                document.getElementById('user-plan-time').innerText = timeStr || "Segera!";
+                document.getElementById('user-plan-note').innerText = `DENGAN NABUNG Rp ${Zuna.fmt(ability)} / HARI`;
+            } else {
+                userPlanBox.style.display = 'none';
+            }
+
+            // 2. Generate Proyeksi Durasi
+            const strategies = [
+                { lab: 'Kilat', dur: 30, t: 'red' },
+                { lab: 'Ideal', dur: 90, t: 'green' },
+                { lab: 'Santai', dur: 180, t: 'indigo' },
+                { lab: 'Konsisten', dur: 365, t: 'sub' },
+                { lab: 'Jangka Menengah', dur: 365 * 3, t: 'sub' },
+                { lab: 'Rencana Besar', dur: 365 * 5, t: 'sub' },
+                { lab: 'Masa Depan', dur: 365 * 10, t: 'sub' }
+            ];
+
+            const listCont = document.getElementById('strategy-list');
+            listCont.innerHTML = '';
+
+            strategies.forEach((s, i) => {
+                const daily = Math.ceil(remainder / s.dur);
+                const monthly = Math.ceil(remainder / (s.dur / 30));
+                
+                let durLab = "";
+                if (s.dur < 365) durLab = (s.dur / 30) + " Bulan";
+                else durLab = (s.dur / 365) + " Tahun";
+
+                const card = document.createElement('div');
+                card.className = 'strategy-card animate-item';
+                card.style.animationDelay = (i * 0.05) + 's';
+                card.innerHTML = `
+                    <div class="strategy-info">
+                        <span class="tag" style="background:var(--${s.t}); color:${s.t==='sub'?'#888':'#000'}">${s.lab}</span>
+                        <span class="dur-text">${durLab}</span>
+                    </div>
+                    <div class="strategy-values">
+                        <span class="v-daily">Rp ${Zuna.fmt(daily)} <small style="font-size:8px; opacity:0.5">/hr</small></span>
+                        <span class="v-monthly">Rp ${Zuna.fmt(monthly)} /bln</span>
+                    </div>
+                `;
+                listCont.appendChild(card);
+            });
         };
 
-        // Pasang auto-format titik dan auto-hitung
         Zuna.bindFmt('target-price', calculate);
+        Zuna.bindFmt('target-current', calculate);
+        Zuna.bindFmt('target-daily-ability', calculate);
+        document.getElementById('target-name').oninput = calculate;
     }
 });
